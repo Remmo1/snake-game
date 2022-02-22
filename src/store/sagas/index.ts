@@ -21,9 +21,9 @@ export function* moveSaga(params: {
     type : string;
     payload : ISnakeCoord;
 }) : Generator<
-    PutEffect<{type: string; payload: ISnakeCoord}>
-    PutEffect<{type: string; payload: string}>
-    CallEffect<true>
+    | PutEffect<{type: string; payload: ISnakeCoord}>
+    | PutEffect<{type: string; payload: string}>
+    | CallEffect<true>
     > {
     while(true) {
             yield put({
@@ -48,7 +48,7 @@ export function* moveSaga(params: {
         }
     }
 
-    fuction* watcherSagas() {
+    function* watcherSagas() {
         yield takeLatest(
             [MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN],
                 moveSaga

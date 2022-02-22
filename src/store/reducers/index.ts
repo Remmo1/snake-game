@@ -1,22 +1,8 @@
+import {DOWN, ISnakeCoord, LEFT, RIGHT, UP} from "../actions";
+
 const GlobalState = {
     data: ""
 };
-
-const gameReducer = (state = GlobalState, action) => {
-    switch (action.type) {
-        case "MOVE_RIGHT":
-            return {
-                ...state, data: action.payload
-            };
-        default:
-            return state;
-    }
-}
-
-interface ISnakeCoord {
-    x: number;
-    y: number;
-}
 
 export interface IGlobalState {
     snake: ISnakeCoord[] | [];
@@ -33,5 +19,28 @@ const globalState: IGlobalState = {
     ],
     disallowedDirection: ""
 };
+
+const gameReducer = (state = globalState, action) => {
+    switch (action.type) {
+        case RIGHT:
+        case LEFT:
+        case UP:
+        case DOWN: {
+            let newSnake = [...state.snake];
+            newSnake = [{
+                x: state.snake[0].x + action.payload[0],
+                y: state.snake[0].y + action.payload[1],
+            }, ...newSnake];
+            newSnake.pop();
+
+            return {
+                ...state,
+                snake: newSnake,
+            };
+        }
+    }
+}
+
+
 
 export default gameReducer;
