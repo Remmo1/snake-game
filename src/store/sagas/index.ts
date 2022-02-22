@@ -53,7 +53,7 @@ export function* moveSaga(params: {
 
     function* watcherSagas() {
         yield takeLatest(
-            [MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN],
+            [MOVE_RIGHT, MOVE_LEFT, MOVE_UP, MOVE_DOWN, RESET, STOP_GAME],
                 moveSaga
         );
 }
