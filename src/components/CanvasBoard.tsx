@@ -2,7 +2,16 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {IGlobalState} from "../store/reducers";
 import {clearBoard, drawObject, generateRandomPosition, IObjectBody} from "../utilities";
-import {makeMove, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, MOVE_UP} from "../store/actions";
+import {
+    increaseSnake,
+    INCREMENT_SCORE,
+    makeMove,
+    MOVE_DOWN,
+    MOVE_LEFT,
+    MOVE_RIGHT,
+    MOVE_UP,
+    scoreUpdates
+} from "../store/actions";
 import {clear} from "@testing-library/user-event/dist/clear";
 
 export interface ICanvasBoard {
@@ -27,6 +36,8 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+
+    const [isConsumed, setIsConsumed] = useState<boolean>(false);
 
     const moveSnake = useCallback(
         (dx = 0, dy = 0, ds: string) => {
@@ -96,10 +107,27 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
     );
 
     useEffect(() => {
+        if (isConsumed) {
+            const posi = generateRandomPosition(width - 20, height - 20);
+            setPos(posi);
+            setIsConsumed(false);
+
+            dispatch(increaseSnake());
+
+            dispatch(scoreUpdates(INCREMENT_SCORE));
+        }
+    }, [isConsumed, pos, height, width, dispatch]);
+
+    useEffect(() => {
         setContext(canvasRef.current && canvasRef.current.getContext("2d"));
         clearBoard(context);
         drawObject(context, snake1, "#91C483");
         drawObject(context, [pos], "#676FA3");
+
+        if (snake1[0].x === pos?.x && snake1[0].y === pos?.y) {
+            setIsConsumed(true);
+        }
+
     }, [context, pos, snake1, height, width, dispatch, handleKeyEvents]);
 
     useEffect(() => {
@@ -116,7 +144,7 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
             <canvas
                 ref={canvasRef}
                 style={{
-                    border: "3px solid back",
+                    border: "3px solid black",
                 }}
                 height={height}
                 width={width}
