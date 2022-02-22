@@ -1,4 +1,14 @@
-import {DOWN, INCREASE_SNAKE, INCREMENT_SCORE, ISnakeCoord, LEFT, RIGHT, SET_DIS_DIRECTION, UP} from "../actions";
+import {
+    DOWN,
+    INCREASE_SNAKE,
+    INCREMENT_SCORE,
+    ISnakeCoord,
+    LEFT,
+    RESET_SCORE,
+    RIGHT,
+    SET_DIS_DIRECTION,
+    UP
+} from "../actions";
 
 export interface IGlobalState {
     snake: ISnakeCoord[] | [];
@@ -60,6 +70,12 @@ const gameReducer = (state = globalState, action: any) => {
             return {
                 ...state,
                 score: state.score + 1,
+            };
+
+        case RESET_SCORE:
+            return {
+                ...state,
+                score: 0
             };
 
         default:

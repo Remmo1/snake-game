@@ -9,10 +9,12 @@ import {
     MOVE_DOWN,
     MOVE_LEFT,
     MOVE_RIGHT,
-    MOVE_UP,
+    MOVE_UP, RESET_SCORE, resetGame,
     scoreUpdates, stopGame
 } from "../store/actions";
 import {clear} from "@testing-library/user-event/dist/clear";
+import Instructions from "./Instructions";
+import Instruction from "./Instructions";
 
 export interface ICanvasBoard {
     height: number;
@@ -96,6 +98,10 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
 
     const resetBoard = useCallback(() => {
         window.removeEventListener("keypress", handleKeyEvents);
+
+        dispatch(resetGame());
+        dispatch(scoreUpdates(RESET_SCORE));
+
         clearBoard(context);
         drawObject(context, snake1, "#91C483");
         drawObject(
@@ -160,11 +166,12 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
             <canvas
                 ref={canvasRef}
                 style={{
-                    border: "3px solid black",
+                    border: `3px solid ${gameEnded ? "red" : "black"}`,
                 }}
                 height={height}
                 width={width}
             />
+            <Instruction resetBoard={resetBoard}/>
         </>
 
     );
