@@ -1,4 +1,4 @@
-import {DOWN, ISnakeCoord, LEFT, RIGHT, UP} from "../actions";
+import {DOWN, ISnakeCoord, LEFT, RIGHT, SET_DIS_DIRECTION, UP} from "../actions";
 
 export interface IGlobalState {
     snake: ISnakeCoord[] | [];
@@ -34,6 +34,12 @@ const gameReducer = (state = globalState, action: any) => {
                 snake: newSnake,
             };
         }
+
+        case SET_DIS_DIRECTION:
+            return {
+                ...state,
+                disallowedDirection: action.payload
+            };
 
         default:
             return state;

@@ -1,8 +1,9 @@
-import {useCallback, useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {IGlobalState} from "../store/reducers";
-import {drawObject, generateRandomPosition, IObjectBody} from "../utilities";
+import {clearBoard, drawObject, generateRandomPosition, IObjectBody} from "../utilities";
 import {makeMove, MOVE_DOWN, MOVE_LEFT, MOVE_RIGHT, MOVE_UP} from "../store/actions";
+import {clear} from "@testing-library/user-event/dist/clear";
 
 export interface ICanvasBoard {
     height: number;
@@ -11,13 +12,9 @@ export interface ICanvasBoard {
 
 const CanvasBoard = ({ height, width }: ICanvasBoard) => {
 
-    const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-    const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+    const dispatch = useDispatch();
 
     const snake1 = useSelector((state : IGlobalState) => state.snake);
-
-    const dispatch = useDispatch();
 
     const disallowedDirection = useSelector(
         (state: IGlobalState) => state.disallowedDirection
@@ -26,6 +23,10 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
     const [pos, setPos] = useState<IObjectBody>(
         generateRandomPosition(width - 20, height - 20)
     );
+
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+    const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
     const moveSnake = useCallback(
         (dx = 0, dy = 0, ds: string) => {
@@ -80,11 +81,26 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
         }, [disallowedDirection, moveSnake]
     );
 
+    const resetBoard = useCallback(() => {
+        window.removeEventListener("keypress", handleKeyEvents);
+        clearBoard(context);
+        drawObject(context, snake1, "#91C483");
+        drawObject(
+            context,
+            [generateRandomPosition(width - 20, height - 20)],
+            "#676FA3"
+        );
+        window.addEventListener("keypress", handleKeyEvents);
+        },
+        [context, dispatch, handleKeyEvents, height, snake1, width]
+    );
+
     useEffect(() => {
         setContext(canvasRef.current && canvasRef.current.getContext("2d"));
+        clearBoard(context);
         drawObject(context, snake1, "#91C483");
         drawObject(context, [pos], "#676FA3");
-    }, [context]);
+    }, [context, pos, snake1, height, width, dispatch, handleKeyEvents]);
 
     useEffect(() => {
         window.addEventListener("keypress", handleKeyEvents);
@@ -96,14 +112,17 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
 
 
     return (
-        <canvas
-            ref={canvasRef}
-            style={{
-                border: "3px solid back",
-            }}
-            height={height}
-            width={width}
-        />
+        <>
+            <canvas
+                ref={canvasRef}
+                style={{
+                    border: "3px solid back",
+                }}
+                height={height}
+                width={width}
+            />
+        </>
+
     );
 };
 
