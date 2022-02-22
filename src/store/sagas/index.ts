@@ -14,7 +14,7 @@ import {
     MOVE_LEFT,
     MOVE_RIGHT,
     MOVE_UP, RIGHT,
-    setDisDirection, UP
+    setDisDirection, STOP_GAME, UP
 } from "../actions";
 
 export function* moveSaga(params: {
@@ -25,7 +25,7 @@ export function* moveSaga(params: {
     | PutEffect<{type: string; payload: string}>
     | CallEffect<true>
     > {
-    while(true) {
+    while(params.type !== STOP_GAME) {
             yield put({
                 type: params.type.split("_")[1],
                 payload: params.payload,
@@ -34,12 +34,15 @@ export function* moveSaga(params: {
                 case RIGHT:
                     yield put(setDisDirection(LEFT));
                     break;
+
                 case LEFT:
                     yield put(setDisDirection(RIGHT));
                     break;
+
                 case UP:
                     yield put(setDisDirection(DOWN));
                     break;
+
                 case DOWN:
                     yield put(setDisDirection(UP));
                     break;

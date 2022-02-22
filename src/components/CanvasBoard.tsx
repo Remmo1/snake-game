@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {IGlobalState} from "../store/reducers";
-import {clearBoard, drawObject, generateRandomPosition, IObjectBody} from "../utilities";
+import {clearBoard, drawObject, generateRandomPosition, hasSnakeCollided, IObjectBody} from "../utilities";
 import {
     increaseSnake,
     INCREMENT_SCORE,
@@ -10,7 +10,7 @@ import {
     MOVE_LEFT,
     MOVE_RIGHT,
     MOVE_UP,
-    scoreUpdates
+    scoreUpdates, stopGame
 } from "../store/actions";
 import {clear} from "@testing-library/user-event/dist/clear";
 
@@ -38,6 +38,8 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
     const [isConsumed, setIsConsumed] = useState<boolean>(false);
+
+    const [gameEnded, setGameEnded] = useState<boolean>(false);
 
     const moveSnake = useCallback(
         (dx = 0, dy = 0, ds: string) => {
@@ -124,9 +126,23 @@ const CanvasBoard = ({ height, width }: ICanvasBoard) => {
         drawObject(context, snake1, "#91C483");
         drawObject(context, [pos], "#676FA3");
 
+        // when the object is consumed
         if (snake1[0].x === pos?.x && snake1[0].y === pos?.y) {
             setIsConsumed(true);
         }
+
+        // collison detection
+        if (
+            hasSnakeCollided(snake1, snake1[0]) ||
+            snake1[0].x >= width ||
+            snake1[0].x <= 0 ||
+            snake1[0].y >= height ||
+            snake1[0].y <= 0
+        ) {
+            setGameEnded(true);
+            dispatch(stopGame());
+            window.removeEventListener("keypress", handleKeyEvents);
+        } else setGameEnded(false);
 
     }, [context, pos, snake1, height, width, dispatch, handleKeyEvents]);
 
