@@ -3,7 +3,7 @@ import {
     INCREASE_SNAKE,
     INCREMENT_SCORE,
     ISnakeCoord,
-    LEFT,
+    LEFT, RESET,
     RESET_SCORE,
     RIGHT,
     SET_DIS_DIRECTION,
@@ -71,6 +71,20 @@ const gameReducer = (state = globalState, action: any) => {
                 ...state,
                 score: state.score + 1,
             };
+
+        case RESET:
+            return {
+                ...state,
+                snake: [
+                    { x: 580, y: 300 },
+                    { x: 560, y: 300 },
+                    { x: 540, y: 300 },
+                    { x: 520, y: 300 },
+                    { x: 500, y: 300},
+                ],
+                disallowedDirection: "",
+            };
+
 
         case RESET_SCORE:
             return {
